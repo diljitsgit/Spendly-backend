@@ -591,14 +591,9 @@ def chat():
         # Get financial advice
         response = get_financial_advice(user_id, message)
         
-        # Log the complete response for debugging
-        logger.info(f"Complete response: {response}")
-        
-        # Ensure response is properly encoded and complete
         return jsonify({
             'response': response,
-            'status': 'success',
-            'response_length': len(response) if response else 0
+            'status': 'success'
         }), 200
         
     except Exception as e:
@@ -723,6 +718,17 @@ def get_model_prediction(amount, category, fallback_categories=None):
             fallback = fallback_categories[category]
             return fallback['type'], fallback['confidence']
         return 'Unknown', 0.5
+
+@app.route('/debug/routes', methods=['GET'])
+def list_routes():
+    routes = []
+    for rule in app.url_map.iter_rules():
+        routes.append({
+            'endpoint': rule.endpoint,
+            'methods': list(rule.methods),
+            'path': str(rule)
+        })
+    return jsonify(routes)
 
 if __name__ == '__main__':
     try:
